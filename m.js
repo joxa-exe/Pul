@@ -3,7 +3,7 @@ const fs = require('fs');
 
 // ===== CONFIG =====
 const BOT_TOKEN = '8466964240:AAFnraSAV1Dif2rzj76E6-OWum2bhgNFJFk';
-const ADMIN_IDS = [8309765828];  // admin ID
+const ADMIN_IDS = [6499472207, 8309765828];  // admin ID
 const CHANNELS = ['GOJO_SHOP_ROBLOX', 'ROBLOXUZBEKISTANN1']; // majburiy obuna kanallar
 
 // ===== BOT =====

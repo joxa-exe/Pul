@@ -5,7 +5,10 @@ const fs = require('fs');
 const BOT_TOKEN = '8466964240:AAFnraSAV1Dif2rzj76E6-OWum2bhgNFJFk';
 const ADMIN_IDS = [6499472207, 8309765828];  // admin ID
 const CHANNELS = ['GOJO_SHOP_ROBLOX']; // majburiy obuna kanallar
-
+// ===== ANTI FLOOD =====
+const floodMap = {};
+const FLOOD_LIMIT = 4;   // 5 soniyada nechta xabar ruxsat
+const FLOOD_TIME = 5000; // millisekund
 // ===== BOT =====
 const bot = new Telegraf(BOT_TOKEN);
 
@@ -82,6 +85,36 @@ async function requireSubscription(ctx) {
   return true;
 }
 
+bot.use(async (ctx, next) => {
+  if (!ctx.from) return next();
+
+  // Adminlar flooddan ozod
+  if (ADMIN_IDS.includes(ctx.from.id)) return next();
+
+  const userId = ctx.from.id;
+  const now = Date.now();
+
+  if (!floodMap[userId]) {
+    floodMap[userId] = { count: 1, time: now };
+    return next();
+  }
+
+  if (now - floodMap[userId].time < FLOOD_TIME) {
+    floodMap[userId].count++;
+
+    if (floodMap[userId].count > FLOOD_LIMIT) {
+      try {
+        await ctx.reply('⛔ Flood! Iltimos 5 soniya kuting.');
+      } catch {}
+      return; // ❌ shu yerda to‘xtaydi
+    }
+  } else {
+    floodMap[userId] = { count: 1, time: now };
+  }
+
+  return next();
+});
+
 // ===== START =====
 bot.start(async ctx => {
   const id = ctx.from.id;
@@ -103,7 +136,7 @@ bot.start(async ctx => {
   // Obuna tekshirish
   if (!(await requireSubscription(ctx))) return;
 
-  ctx.reply('🏪 Robux shopga xush kelibsiz', mainMenu);
+  ctx.reply('🏪 Robux shopga xush kelibsiz                 🧑‍💻 dev:@OnGDsLJs', mainMenu);
 });
 
 // ===== ORQAGA =====
@@ -198,6 +231,7 @@ bot.hears('👥 Referral link', async ctx => {
 
   ctx.reply(`👥 Referral linkingiz:\n${link}\n\n👤 Takliflar: ${count}\n🎁 Bonus: ${count * 1} Robux`);
 });
+
 
 // ===== ADMIN =====
 bot.hears('📞 Admin', async ctx => {
